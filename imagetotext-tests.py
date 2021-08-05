@@ -9,7 +9,7 @@ import_module('imagetotext')
 class SarcasticTests(unittest.TestCase):
 
     def test_gets_correct_character_for_pixels(self):
-        im = Image.new("RGB", (2, 4))
+        im = Image.new("RGB", (2, 4), (0, 0, 0))
         pix = im.load()  # all black
 
         actual = get_character_for_pixels(pix)
@@ -17,11 +17,11 @@ class SarcasticTests(unittest.TestCase):
 
         pix[0, 0] = (255, 255, 255)
         actual = get_character_for_pixels(pix)
-        self.assertEqual(actual, chr(0X2801))  # ⣾
+        self.assertEqual(actual, chr(0X28FE))  # ⣾
 
         pix[1, 1] = (255, 255, 255)
         actual = get_character_for_pixels(pix)
-        self.assertEqual(actual, chr(0X2811))  # ⣮
+        self.assertEqual(actual, chr(0X28EE))  # ⣮
 
 
 if __name__ == '__main__':
