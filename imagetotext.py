@@ -4,6 +4,7 @@ from PIL import Image, ImageOps
 
 # This will cut off images that aren't a multiple of (2 x 4). If this becomes an issue for some reason, get_character_for_pixels can be extended for partials
 def get_text_for_image(image):
+    print(image.width, image.height)
     subwidth = 2
     subheight = 4
 
@@ -15,15 +16,15 @@ def get_text_for_image(image):
 
     textlist = []
 
-    for row in range(rows):
-        rowlist = []
-        for column in range(columns):
+    for column in range(columns):
+        columnlist = []
+        for row in range(rows):
             x = row * subheight
             y = column * subwidth
             subimage = image.crop((x, y, x + subwidth, y + subheight))
             character = get_character_for_pixels(subimage.load())
-            rowlist.append(character)
-        textlist.append(''.join(rowlist))
+            columnlist.append(character)
+        textlist.append(''.join(columnlist))
 
     return '\n'.join(textlist)
 
@@ -79,8 +80,17 @@ def load_image(path, max_size):
             ratio = max_size / current_size[1]
             new_size = (int(ratio * current_size[0]), int(ratio * current_size[1]))
 
-        return ImageOps.grayscale(image.resize(new_size))
-        # return image
+        background = Image.new('RGB', new_size, (0, 0, 0))
+        resized_image = image.resize(new_size)
+        # background.paste from https://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
+        if len(resized_image.getbands()) > 3:
+            background.paste(resized_image, mask=resized_image.split()[3]) # 3 = alpha
+            grayscale = ImageOps.grayscale(background)
+        else:
+            grayscale = ImageOps.grayscale(resized_image)
+        grayscale.save('wat.png')
+        return grayscale
+
     except Exception as e:
         print(str(e))
         return None
@@ -89,7 +99,7 @@ def load_image(path, max_size):
 def main(args):
     if not args.file:
         return 'You must provide either a file or phrase. Type sarcastic.py -h for help.'
-    image = load_image(args.file, 128)
+    image = load_image(args.file, 64)
     if not image:
         return f'Failed to load {args.file}.'
     return get_text_for_image(image)

@@ -36,6 +36,25 @@ class SarcasticTests(unittest.TestCase):
         actual = get_text_for_image(im)
         self.assertEqual(actual, chr(0X28EE))  # ⣮
 
+    
+    def test_gets_correct_grayscale_for_image(self):
+        im_100 = Image.new('RGB', (2, 4), (0, 0, 0))
+        actual = get_text_for_image(im_100.load())
+        self.assertEqual(actual, chr(0X28FF))  # ⣿
+
+        im_75 = Image.new('RGB', (2, 4), (64, 64, 64))
+        actual = get_text_for_image(im_75.load())
+        self.assertEqual(actual, chr(0X280C)) # ⠌
+
+        im_50 = Image.new('RGB', (2, 4), (128, 128, 128))
+        actual = get_text_for_image(im_50.load())
+        self.assertEqual(actual, chr(0X286A)) # ⡪
+
+        im_25 = Image.new('RGB', (2, 4), (192, 192, 192))
+        actual = get_text_for_image(im_50.load())
+        self.assertEqual(actual, chr(0X286A)) # 
+
+
 
     def test_gets_correct_character_for_256_pixel_image(self):
         im = Image.open('TestImages/allblack16x16.png')
