@@ -1,8 +1,30 @@
 from PIL import Image
 
 
+# This will cut off images that aren't a multiple of (2 x 4). If this becomes an issue for some reason, get_character_for_pixels can be extended for partials
 def get_text_for_image(image):
-    pass
+    subwidth = 2
+    subheight = 4
+
+    x = 0
+    y = 0
+
+    columns = int(image.width / subwidth)
+    rows = int(image.height / subheight)
+
+    textlist = []
+
+    for row in range(rows):
+        rowlist = []
+        for column in range(columns):
+            x = row * subheight
+            y = column * subwidth
+            subimage = image.crop((x, y, x + subwidth, y + subheight))
+            character = get_character_for_pixels(subimage.load())
+            rowlist.append(character)
+        textlist.append(''.join(rowlist))
+
+    return '\n'.join(textlist)
 
 
 def get_character_for_pixels(pixels):
