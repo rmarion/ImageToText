@@ -1,0 +1,60 @@
+
+    #include <Python.h>
+#include <string.h>
+
+static PyObject *
+imagetotext_convert_image(PyObject *self, PyObject *args)
+{
+    auto output = std::string("hello");
+    return PyString_FromString(output)
+}
+
+static PyMethodDef imagetotext_methods[] =
+    {
+        {"convert_image", imagetotext_convert_image, METH_NOARGS,
+         "Converts an image into text"},
+        {NULL, NULL, 0, NULL} /* sentinel */
+};
+
+static struct PyModuleDef imagetotextmodule =
+    {
+        PyModuleDef_HEAD_INIT,
+        "imagetotext", /* name of module */
+        NULL,          /* module documentation, may be NULL */
+        -1,            /* size of per-interpreter state of the module,
+                   or -1 if the module keeps state in global variables */
+        imagetotext_methods};
+
+PyMODINIT_FUNC
+PyInit_imagetotext(void)
+{
+    return PyModule_Create(&imagetotextmodule);
+}
+
+int main(int argc, char **argv)
+{
+    wchar_t *program = Py_DecodeLocale(argv[0], NULL);
+    if (program == NULL)
+    {
+        fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
+        exit(1);
+
+        /* Add a built-in module, before Py_Initialize */
+        PyImport_AppendInittab("imagetotext", PyInit_imagetotext);
+
+        /* Pass argv[0] to the Python interpreter */
+        Py_SetProgramName(program);
+
+        /* Initialize the Python interpreter. Required. */
+        Py_Initialize();
+
+        /* Optionally import the module; alteratively,
+        import can be deferred until the embedded script
+        imports it. */
+        PyImport_ImportModule("imagetotext");
+
+        /* do my stuff */
+        PyMem_RawFree(program);
+        return 0;
+    }
+}

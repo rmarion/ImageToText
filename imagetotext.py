@@ -1,4 +1,5 @@
 import argparse
+from cimagetotext import convert_image
 from PIL import Image, ImageOps
 
 
@@ -33,28 +34,28 @@ def get_character_for_pixels(pixels):
     threshold = 75
     byte = 255  # we'll progressively remove the non-matching parts of this with a bytemask to get our matching code
 
-    if pixels[0, 0] > threshold: # ⣾
+    if pixels[0, 0] > threshold:  # ⣾
         byte ^= 1
 
-    if pixels[0, 1] > threshold: # ⣽
+    if pixels[0, 1] > threshold:  # ⣽
         byte ^= 2
 
-    if pixels[0, 2] > threshold: # ⣻
+    if pixels[0, 2] > threshold:  # ⣻
         byte ^= 4
 
-    if pixels[1, 0] > threshold: # ⣷
+    if pixels[1, 0] > threshold:  # ⣷
         byte ^= 8
 
-    if pixels[1, 1] > threshold: # ⣯
+    if pixels[1, 1] > threshold:  # ⣯
         byte ^= 16
 
-    if pixels[1, 2] > threshold: # ⣟
+    if pixels[1, 2] > threshold:  # ⣟
         byte ^= 32
 
-    if pixels[0, 3] > threshold: # ⢿
+    if pixels[0, 3] > threshold:  # ⢿
         byte ^= 64
 
-    if pixels[1, 3] > threshold: # ⡿
+    if pixels[1, 3] > threshold:  # ⡿
         byte ^= 128
 
     return chr(0X2800 + byte)  # the braille unicode goes from 0X2800 -> 0X28FF
@@ -75,16 +76,19 @@ def load_image(path, max_size):
 
         if current_size[0] > current_size[1]:
             ratio = max_size / current_size[0]
-            new_size = (int(ratio * current_size[0]), int(ratio * current_size[1]))
+            new_size = (
+                int(ratio * current_size[0]), int(ratio * current_size[1]))
         else:
             ratio = max_size / current_size[1]
-            new_size = (int(ratio * current_size[0]), int(ratio * current_size[1]))
+            new_size = (
+                int(ratio * current_size[0]), int(ratio * current_size[1]))
 
         background = Image.new('RGB', new_size, (0, 0, 0))
         resized_image = image.resize(new_size)
         # background.paste from https://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
         if len(resized_image.getbands()) > 3:
-            background.paste(resized_image, mask=resized_image.split()[3]) # 3 = alpha
+            background.paste(
+                resized_image, mask=resized_image.split()[3])  # 3 = alpha
             grayscale = ImageOps.grayscale(background)
         else:
             grayscale = ImageOps.grayscale(resized_image)
@@ -103,8 +107,9 @@ def main(args):
     if not image:
         return f'Failed to load {args.file}.'
     return get_text_for_image(image)
-    
+
 
 if __name__ == '__main__':
+    print(convert_image())
     args = get_args()
     print(main(args))
