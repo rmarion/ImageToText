@@ -27,9 +27,35 @@ bool expect_white_pixels_return_white_unicode()
     return expected == actual;
 }
 
+bool expect_single_swapped_pixel_returns_correct_unicode()
+{
+    short pixels[2][4] = {
+        {255, 0, 0},
+        {0, 0, 0}};
+
+    auto sut = c_image_to_text::ImageToTextConverter();
+    auto actual = sut.get_character_for_pixels(pixels);
+    auto expected = std::string(u8"\u28FE");
+    return expected == actual;
+}
+
+bool expect_two_swapped_pixels_return_correct_unicode()
+{
+    short pixels[2][4] = {
+        {255, 0, 0},
+        {0, 255, 0}};
+
+    auto sut = c_image_to_text::ImageToTextConverter();
+    auto actual = sut.get_character_for_pixels(pixels);
+    auto expected = std::string(u8"\u28EE");
+    return expected == actual;
+}
+
 int main(void)
 {
     assert(expect_black_pixels_return_black_unicode());
     assert(expect_white_pixels_return_white_unicode());
+    assert(expect_single_swapped_pixel_returns_correct_unicode());
+    assert(expect_two_swapped_pixels_return_correct_unicode());
     return 0;
 }
