@@ -1,10 +1,14 @@
 #include "ImageToTextConverter.h"
+#include <string>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 namespace c_image_to_text
 {
-    const char *ImageToTextConverter::get_character_for_pixels(const short pixels[2][4])
+    const std::string ImageToTextConverter::get_character_for_pixels(const short pixels[2][4]) const
     {
-        short byte = 255; // we'll progressively remove the non-matching parts of this with a bytemask to get our matching code
+        unsigned long byte = 0X28FF; // we'll progressively remove the non-matching parts of this with a bytemask to get our matching code
 
         if (pixels[0][0] > threshold_) // ⣾
         {
@@ -45,14 +49,10 @@ namespace c_image_to_text
         {
             byte ^= 128;
         }
+        // from https://stackoverflow.com/questions/20419605/how-to-convert-unicode-code-points-to-utf-8-in-c
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+        auto string = converter.to_bytes(byte);
 
-        char bytes[4];
-        unsigned long character = 0x2800 + byte;
-
-        bytes[0] = (character >> 24) & 0xFF;
-        bytes[1] = (character >> 16) & 0xFF;
-        bytes[2] = (character >> 8) & 0xFF;
-        bytes[3] = character & 0xFF;
-        return bytes;
+        return string;
     }
 }
