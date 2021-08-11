@@ -3,10 +3,11 @@
 #include <locale>
 #include <codecvt>
 #include <string>
+#include <Magick++.h>
 
 namespace c_image_to_text
 {
-    const std::string ImageToTextConverter::get_character_for_pixels(const short pixels[2][4]) const
+    const std::string ImageToTextConverter::get_character_for_pixels(const std::array<std::array<short, 4>, 2> pixels) const
     {
         unsigned long byte = 0X28FF; // we'll progressively remove the non-matching parts of this with a bytemask to get our matching code
 
