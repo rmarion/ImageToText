@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <numeric>
 #include "ImageToTextConverter.h"
 #include <Magick++.h>
 
@@ -71,9 +72,6 @@ bool expect_all_black_8_pixel_image_returns_correct_unicode()
     Image image;
     image.read("../TestImages/allblack.png");
 
-    // int width = image.columns();
-    // int height = image.rows();
-
     auto pixels = get_pixels(0, 0, 2, 4, image);
 
     auto sut = c_image_to_text::ImageToTextConverter();
@@ -81,14 +79,6 @@ bool expect_all_black_8_pixel_image_returns_correct_unicode()
     auto expected = std::string(u8"\u28FF");
 
     return expected == actual;
-
-    // for (int y = 0; y < height; y++)
-    // {
-    //     for (int x = 0; x < width; x++)
-    //     {
-    //         std::cout << x << "," << y << ": Shade:" << test_pixels[x][y] << std::endl;
-    //     }
-    // }
 }
 
 bool expect_only_upper_left_white_image_returns_correct_unicode()
@@ -119,6 +109,36 @@ bool expect_only_diagonal_white_image_returns_correct_unicode()
     return expected == actual;
 }
 
+bool expect_gets_correct_character_for_256_pixel_image()
+{
+    Image image;
+    image.read("../TestImages/allblack16x16.png");
+
+    auto sut = c_image_to_text::ImageToTextConverter();
+    auto actual = sut.get_text_for_image(image);
+
+    auto expected = std::string(u8"\u28FF");
+
+    int black_characters = 0;
+    auto black_char_pos = actual.find(expected);
+    while (black_char_pos != std::string::npos)
+    {
+        black_characters++;
+        black_char_pos = actual.find(expected, black_char_pos + expected.length());
+    }
+
+    auto newline = std::string("\n");
+    int newlines = 0;
+    auto newline_pos = actual.find(newline);
+    while (newline_pos != std::string::npos)
+    {
+        newlines++;
+        newline_pos = actual.find(newline, newline_pos + newline.length());
+    }
+
+    return black_characters == 32 && newlines == 4;
+}
+
 int main(void)
 {
     auto test_methods = std::vector<bool (*)()>{
@@ -128,14 +148,21 @@ int main(void)
         expect_two_swapped_pixels_return_correct_unicode,
         expect_all_black_8_pixel_image_returns_correct_unicode,
         expect_only_upper_left_white_image_returns_correct_unicode,
-        expect_only_diagonal_white_image_returns_correct_unicode};
+        expect_only_diagonal_white_image_returns_correct_unicode,
+        expect_gets_correct_character_for_256_pixel_image};
 
     for (auto &test_method : test_methods)
     {
         try
         {
-            assert(test_method());
-            std::cout << "Test passed!" << std::endl;
+            if (test_method())
+            {
+                std::cout << "Test passed!" << std::endl;
+            }
+            else
+            {
+                std::cout << "Test failed." << std::endl;
+            }
         }
         catch (std::exception &e)
         {

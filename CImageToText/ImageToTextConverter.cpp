@@ -1,13 +1,15 @@
 #include "ImageToTextConverter.h"
+#include <array>
 #include <string>
 #include <locale>
 #include <codecvt>
 #include <string>
+#include <sstream>
 #include <Magick++.h>
 
 namespace c_image_to_text
 {
-    const std::string ImageToTextConverter::get_character_for_pixels(const std::array<std::array<short, 4>, 2> pixels) const
+    const std::string ImageToTextConverter::get_character_for_pixels(const std::array<std::array<short, 4>, 2> &pixels) const
     {
         unsigned long byte = 0X28FF; // we'll progressively remove the non-matching parts of this with a bytemask to get our matching code
 
@@ -55,5 +57,39 @@ namespace c_image_to_text
         auto string = converter.to_bytes(byte);
 
         return string;
+    }
+
+    const std::array<std::array<short, 4>, 2> ImageToTextConverter::get_pixels(int x, int y, int width, int height, const Magick::Image &image) const
+    {
+        auto pixels = std::array<std::array<short, 4>, 2>();
+        for (int row = y; row < height; row++)
+        {
+            for (int column = x; column < width; column++)
+            {
+                auto color = Magick::ColorGray(image.pixelColor(column, row));
+                pixels[column][row] = color.shade();
+            }
+        }
+
+        return pixels;
+    }
+
+    const std::string ImageToTextConverter::get_text_for_image(const Magick::Image &image) const
+    {
+        std::stringstream ss;
+        std::array<std::array<short, 4>, 2> pixels;
+        std::string newline = "\n";
+
+        for (int y = 0; y < image.rows(); y += 4)
+        {
+            for (int x = 0; x < image.columns(); x += 2)
+            {
+                pixels = get_pixels(x, y, 2, 4, image);
+                ss << get_character_for_pixels(pixels);
+            }
+            ss << newline;
+        }
+
+        return ss.str();
     }
 }
