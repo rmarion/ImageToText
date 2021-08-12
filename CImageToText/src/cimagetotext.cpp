@@ -1,4 +1,5 @@
 #include <Python.h>
+#include "ImageToTextConverter.h"
 
 static PyObject *
 cimagetotext_convert_image(PyObject *self, PyObject *args)

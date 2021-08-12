@@ -6,13 +6,15 @@ os.environ["CC"] = "g++"
 os.environ["CXX"] = "g++"
 
 cimagetotext = Extension('cimagetotext',
-                         sources=['cimagetotext.cpp'
+                         sources=['cimagetotext.cpp',
+                                  'ImageToTextConverter.cpp'
                                   ],
                          extra_compile_args=['-std=c++14']
                          )
 
 setup(name='cimagetotext',
-      version='0.1',
+      version='${PACKAGE_VERSION}',
       description='Initial test package',
+      package_dir={'': '${CMAKE_CURRENT_SOURCE_DIR}'},
       ext_modules=[cimagetotext],
       )
