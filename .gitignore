@@ -5,3 +5,6 @@ Makefile
 *.cmake
 *.a
 build/
+*.o
+*.out
+*.py.in

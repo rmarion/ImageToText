@@ -1,5 +1,5 @@
 import argparse
-from cimagetotext import convert_image
+from CImageToText import convert_image
 from PIL import Image, ImageOps
 
 

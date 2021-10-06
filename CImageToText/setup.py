@@ -2,19 +2,23 @@ from distutils.core import setup, Extension
 
 import os
 
-os.environ["CC"] = "g++"
-os.environ["CXX"] = "g++"
+os.environ["CC"] = "gcc"
+os.environ["CXX"] = "gcc"
 
 cimagetotext = Extension('cimagetotext',
                          sources=['cimagetotext.cpp',
                                   'ImageToTextConverter.cpp'
                                   ],
-                         extra_compile_args=['-std=c++14']
+                         language='c++',
+                         libraries=['Magick++'],
+                         extra_compile_args=[
+                             '-std=c++14',
+                             '`Magick++-config --cxxflags --cppflags --ldflags --libs`'
+                         ]
                          )
 
 setup(name='cimagetotext',
-      version='${PACKAGE_VERSION}',
+      version='0.1',
       description='Initial test package',
-      package_dir={'': '${CMAKE_CURRENT_SOURCE_DIR}'},
       ext_modules=[cimagetotext],
       )

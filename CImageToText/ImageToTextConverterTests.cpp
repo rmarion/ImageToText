@@ -125,7 +125,7 @@ bool expect_gets_correct_character_for_256_pixel_image()
 bool test_convert_file()
 {
     Image image;
-    image.read("../TestImages/bigsadge.png");
+    image.read("../TestImages/buttholelips2.png");
 
     auto sut = ImageToTextConverter(ConverterMode::Gradient, 0.5, 64);
 
